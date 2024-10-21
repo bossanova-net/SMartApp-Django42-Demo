@@ -23,5 +23,4 @@ YIT-Widecard-2022.pfx
 *.pyproj
 *.pyproj.user
 *.sln
-*.docx
 o365_token.txt
