@@ -1,0 +1,103 @@
+{% extends "app/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  {% include "app/layout_error_message.html" %}
+  {% include "app/includes/navigation_bar.html" %}
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-12">
+        <h1 class="display-4 mb-3 text-center">Delete project and its inventories & PMs</h1>
+        <div class="alert alert-danger" role="alert">
+          <h2 class="alert-heading">
+            Are you sure to permanently delete "<b><u>{{ project }}</u></b>"?
+          </h2>
+          <p class="mb-0">
+            If you delete it, the application would be unrecoverable
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <table class="table table-bordered">
+          <tbody>
+            <tr>
+              <td class="bg-light"><u>ProjectID:</u></td>
+              <td>{{ project.id }}</td>
+            </tr>
+            <tr>
+              <td class="bg-light"><u>ENQ-ID:</u></td>
+              <td>{{ project.enq_id }}</td>
+            </tr>
+            <tr>
+              <td class="bg-light"><u>Company:</u></td>
+              <td>{{ project.company }}</td>
+            </tr>
+            <tr>
+              <td class="bg-light"><u>Name:</u></td>
+              <td>{{ project.project_name }}</td>
+            </tr>
+            <tr>
+              <td class="bg-light"><u>Project Start - End:</u></td>
+              <td>
+                {{ project.project_start | date:"d M Y"}} -
+                {{ project.project_end | date:"d M Y" }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <h3 class="mb-3">No.Incident of Project: {{ total_incident }}</h3>
+        <h3 class="mb-3">List Inventory By Project</h3>
+        {% if inventoryList %}
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">Serial</th>
+                <th scope="col">QTY</th>
+                <th scope="col">ProductType</th>
+                <th scope="col">Brand</th>
+                <th scope="col">Model</th>
+                <th scope="col">Cust Warranty Start</th>
+                <th scope="col">Cust Warranty End</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in inventoryList %}
+                <tr>
+                  <td>{{ item.serial_number }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td>{{ item.product_type }}</td>
+                  <td>{{ item.brand }}</td>
+                  <td>{{ item.model }}</td>
+                  <td>{{ item.customer_warranty_start | date:"d M Y" }}</td>
+                  <td>{{ item.customer_warranty_end | date:"d M Y" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-1">
+          <button href="{% url 'manage_project' %}" class="btn btn-primary mx-auto d-block">Back to all projects</button>
+        </div>
+        <div class="col-md-6">
+          <form action="{% url 'delete_project' project.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" name="deleteButton" class="btn btn-danger mx-auto d-block" onclick="return confirm('Do you want to delete project?')">Delete Project and its inventories & PMs</button>
+          </form>
+        </div>
+    </div>
+      
+      
+  </div>
+{% endblock %}

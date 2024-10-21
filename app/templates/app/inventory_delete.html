@@ -1,0 +1,50 @@
+{% extends "app/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  {% include "app/includes/navigation_bar.html" %}
+  <div class="container mt-4">
+    {% include "app/layout_error_message.html" %}
+    <h1 class="text-center mb-4">Delete Inventory and Its Incidents</h1>
+    <h3 class="mb-4">Are you sure you want to permanently delete "<b><u>{{ inventory }}</u></b>"?</h3>
+    <h4 class="text-danger mb-4">If you delete it, the application would be unrecoverable</h4>
+    <div class="border rounded p-4 mb-4">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover table-condensed">
+          <tr>
+            <td><u>Inventory ID:</u></td>
+            <td>{{ inventory.id }}</td>
+            <td><u>Serial Number:</u></td>
+            <td>{{ inventory.serial_number }}</td>
+          </tr>
+          <tr>
+            <td><u>Qty:</u></td>
+            <td>{{ inventory.quantity }}</td>
+            <td><u>Product Type:</u></td>
+            <td>{{ inventory.product_type }}</td>
+          </tr>
+          <tr>
+            <td><u>Brand:</u></td>
+            <td>{{ inventory.brand }}</td>
+            <td><u>Model:</u></td>
+            <td>{{ inventory.model }}</td>
+          </tr>
+          <tr>
+            <td><u>Customer Warranty Start:</u></td>
+            <td>{{ inventory.customer_warranty_start | date:"d M Y" }}</td>
+            <td><u>Customer Warranty End:</u></td>
+            <td>{{ inventory.customer_warranty_end | date:"d M Y" }}</td>
+          </tr>
+        </table>
+      </div>
+      <h3 class="mb-4">No. PM-Item of Inventory: {{ total_pm_item }}</h3>
+      <h3 class="mb-4">No. Incident of Inventory: {{ total_incident }}</h3>
+      <h4 class="mb-4">List Incident By Inventory</h4>
+    </div>
+    <form action="{% url 'delete_inventory' inventory.id %}" method="POST">
+      {% csrf_token %}
+      <button type="submit" name="deleteButton" class="btn btn-danger mr-2" onclick="return confirm('Do you want to delete inventory?')">Delete Inventory and its incidents, PMItems</button>
+      <a href="{% url 'manage_inventory' %}" class="btn btn-primary">Back to all inventories</a>
+    </form>
+  </div>
+{% endblock %}

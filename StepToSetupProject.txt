@@ -1,0 +1,28 @@
+- install python 3.10 
+- install sqlitebrowser https://sqlitebrowser.org/dl/  or postgresql-15.4-1 or later
+
+- create blank database and store in the same path as project
+
+- create enviroment using requirement.txt
+
+run model--> database migrating
+- python manage.py makemigrations
+- python manage.py migrate
+
+- create super user (first time after  migration)
+python manage.py createsuperuser  
+    username :admin
+    email: admin@local.dev
+    password: P@ssw0rd
+
+-run server
+ python manage.py runserver 9001
+
+
+py -m django --version
+
+
+
+python manage.py collectstatic  
+
+python manage.py shell
