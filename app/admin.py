@@ -37,10 +37,3 @@ class  SLAAdmin(admin.ModelAdmin):
    def has_delete_permission(self, request, obj=None):
        return False
    
-
-@admin.register(ServiceTeam)
-class  ServiceTeamAdmin(admin.ModelAdmin):
-   actions = None
-   def has_delete_permission(self, request, obj=None):
-       return False
-   

@@ -12,6 +12,9 @@ from django.db.models import *
 from app.forms import *
 from app.models import *
 from app.filters import *
+import app.report_manager as reporter
+import openpyxl
+from openpyxl.utils.dataframe import dataframe_to_rows
 
 from urllib.parse import quote
 from urllib.parse import urlencode
@@ -36,19 +39,7 @@ def checkEmpyQueryString(request):
     isNotEmplyQuery = bool(listQueryParma) and len(listValInParma) > 0
     return isNotEmplyQuery
 
-def create_qstring_without_page(request):
-    x_url = request.build_absolute_uri()
-    qsl_dic = dict(parse.parse_qsl(parse.urlsplit(x_url).query))
 
-    qsl_dic = {key: val for key, val in qsl_dic.items() if key != settings.MY_PAGE_NAME}
-    qstr = urlencode(qsl_dic)
-    return qstr
-
-def create_all_qstring(request):
-    x_url = request.build_absolute_uri()
-    qsl_dic = dict(parse.parse_qsl(parse.urlsplit(x_url).query))
-    qstr = urlencode(qsl_dic)
-    return qstr
 
 def init_list_for_dropdownlist_inventory_form(form,brand=None, model=None):
     
@@ -56,8 +47,6 @@ def init_list_for_dropdownlist_inventory_form(form,brand=None, model=None):
         form.fields['brand'].queryset = brand
         form.fields['model'].queryset = model
         
-
-
 
 """
 Create function named "manage_project" in views.py that have id(default value=0) as a parameter  to do the the following.
@@ -145,7 +134,11 @@ Create function named "manage_inventory" in views.py that have id(default value=
 # @login_required
 def manage_inventory(request, id=0):
     project = None
+    isNotEmplyQuery = checkEmpyQueryString(request)
+    
     inventoryList = Inventory.objects.all().prefetch_related('project','model', 'brand', 'product_type')
+    
+    request.session['company_query'] = request.GET.get('company')
     
     if request.method == "GET":
         if id == 0:
@@ -172,10 +165,18 @@ def manage_inventory(request, id=0):
 
     inventoryFilter = InventoryFilter(request.GET, queryset=inventoryList)
 
-    if inventoryFilter.form.is_valid():
+    # if inventoryFilter.form.is_valid():
+    if inventoryFilter.qs.count() > 0  :
         inventoryList = inventoryFilter.qs
+        listIDs = [x.id for x in inventoryList]
+        request.session['query_inventory'] = listIDs
+    else:
+        inventoryList = None
+        request.session['query_inventory'] = None
+        
     
-    context = {'form': form, 'inventoryList': inventoryList, 'project': project, 'inventoryFilter': inventoryFilter}
+    context = {'form': form, 'inventoryList': inventoryList, 'project': project, 
+               'inventoryFilter': inventoryFilter,'isNotEmplyQuery': isNotEmplyQuery}
     return render(request, 'app/inventory_manage.html', context)
 
 
@@ -283,3 +284,71 @@ def load_models_by_brand(request):
     models = Model.objects.filter(brand_id=brand_idx, is_active=True).order_by('model_name')
 
     return render(request, 'app/models_by_brand_list.html', {'models': models})
+
+def export_inventory(request):
+    response = export_data_refactor(request, 'query_inventory')
+    return response
+
+def export_data_refactor(request,query_session):
+    
+    listIDs = request.session.get(query_session, None)
+
+    if listIDs != None:
+        date_btw = ''
+        buildtime = datetime.now().strftime('%d%m%y_%H%M')
+
+        date_from = request.GET.get('date_from')
+        date_to = request.GET.get('date_to')
+        if date_from is not None and date_to is not None:
+            date_btw = f'_From{date_from}_To{date_to}'
+
+        company_query = request.session['company_query']
+
+        if query_session == 'query_project' or query_session == 'query_all_project':
+            df=reporter.report_project(listIDs)
+            if df.empty:
+                messages.error(request, "No project return")
+                return render(request, 'app/export_report.html', {})
+            if (company_query is not None) and (company_query != ''):
+                comanpy_info=Company.objects.get(id=int(company_query ))
+                file_name = f"Project_{comanpy_info.company_name}_{buildtime}.xlsx"
+            else:
+                file_name = f"Project_{buildtime}.xlsx"
+            request.session['company_query'] = None
+
+        elif query_session == 'query_inventory':
+            df = reporter.report_inventory(listIDs)
+            if df.empty:
+                messages.error(request, "No inventory return except dummy inventory")
+                return render(request, 'app/export_report.html', {})
+
+            if (company_query is not None) and (company_query != ''):
+                comanpy_info=Company.objects.get(id=int(company_query ))
+                file_name = f"Inventory_{comanpy_info.company_name}_{buildtime}.xlsx"
+            else:
+                file_name = f"Inventory{date_btw}_{buildtime}.xlsx"
+        # elif  query_session=='query_incident':
+
+        df = df.fillna(value='')
+
+        col_remove = 'ID'
+        if col_remove in df.columns:
+            df = df.drop([col_remove], axis=1)
+
+        if len(df) > 0:
+            try:
+                wb = openpyxl.Workbook(write_only=True)
+                ws = wb.create_sheet()
+                for r in dataframe_to_rows(df, index=False, header=True, ):
+                    ws.append(r)
+            except openpyxl.utils.exceptions.IllegalCharacterError as e:
+                raise e
+
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = f'attachment; filename={file_name}'
+
+
+        wb.save(response)
+
+        return response
+

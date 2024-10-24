@@ -19,18 +19,6 @@ class Company(models.Model):
 
 
 
-class ServiceTeam(models.Model):
-    service_team_name=models.CharField('Service Team Name ',max_length=255)
-    service_team_telephone = models.CharField('Service Team Telephone', max_length=255, default='-')
-    service_team_email = models.CharField('Service Team Email', max_length=150, default='-')
-    def __str__(self):
-        return f'{self.service_team_name}'
-
-    class Meta:
-        ordering = ['service_team_name']
-
-
-        
 
 
 class Project(models.Model):
@@ -95,6 +83,8 @@ class Model(models.Model):
     class Meta:
         ordering = ['model_name']
 
+    def __str__(self):
+        return f'{self.model_name} - {self.brand.brand_name}'
 
 class Product_Type(models.Model):
     productype_name = models.CharField(max_length=255)

@@ -105,22 +105,23 @@ WSGI_APPLICATION = 'web_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': env('DATABASES_NAME'),
-#         'USER': env('DATABASES_USER'),
-#         'PASSWORD': env('DATABASES_PASSWORD'),
-
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'smartdb_django42_demo.db',
+        'ENGINE': 'django.db.backends.postgresql',
+        'HOST': env('DATABASES_HOST'),
+        'NAME': env('DATABASES_NAME'),
+        'USER': env('DATABASES_USER'),
+        'PASSWORD': env('DATABASES_PASSWORD'),
+
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'smartdb_django42_demo.db',
+#     }
+# }
 
 
 # Password validation

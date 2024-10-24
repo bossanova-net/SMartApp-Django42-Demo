@@ -1,4 +1,4 @@
-- install python 3.10 
+- install python 3.101
 - install sqlitebrowser https://sqlitebrowser.org/dl/  or postgresql-15.4-1 or later
 
 - create blank database and store in the same path as project

@@ -24,7 +24,14 @@
         </form>
       </div>
     </div>
+
     {% if inventoryList %}
+        <div style="text-align: right;">
+            {% if inventoryList  and isNotEmplyQuery %}
+                <a href="{% url 'export_inventory' %}" class="btn btn-info"  onclick="return confirm('Do you want to export inventories as an excel file ?')"  >Export Inventory-Report </a>
+            {% endif %}
+        </div>
+
       <div class="card">
         <div class="card-body">
           <div class="table-responsive">
@@ -38,8 +45,10 @@
                   <th scope="col">ProductType</th>
                   <th scope="col">Brand</th>
                   <th scope="col">Model</th>
-                  <th scope="col"><b>Edit</b></th>
                   <th scope="col"><b>Delete</b></th>
+                  <th scope="col"><b>Edit</b></th>
+
+                  <th scope="col"><b>Add Incident</b></th>
                 </tr>
               </thead>
               <tbody>
@@ -52,11 +61,16 @@
                     <td>{{ item.brand }}</td>
                     <td>{{ item.model }}</td>
                     <td>
-                      <a href="{% url 'update_inventory' item.id %}?next={{ request.path|urlencode }}" class="btn btn-link">Edit</a>
-                    </td>
-                    <td>
                       <a href="{% url 'delete_inventory' item.id %}" class="btn btn-danger"
                          onclick="return confirm('Are you sure you want to delete this item?')">Delete</a>
+                    </td>
+                    <td>
+                      <a href="{% url 'update_inventory' item.id %}?next={{ request.path|urlencode }}" class="btn btn-link">Edit</a>
+                    </td>
+              
+                    <td>
+                      <a href="/" class="btn btn-link"
+                         onclick="return confirm('Are you sure you want to add incident?')">Add Incident</a>
                     </td>
                   </tr>
                 {% endfor %}
