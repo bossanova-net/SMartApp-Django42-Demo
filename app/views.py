@@ -102,10 +102,6 @@ def delete_project(request, id):
 
     if request.method == "GET":
         inventory_list = project_obj.inventory_set.all()
-        # total_incident = sum([x.total_incidents() for x in inventory_list])
-
-        # pm_list = project_obj.preventivemaintenance_set.all()
-        # total_pm=pm_list.count()
 
     try:
         if request.method == "POST":
@@ -131,6 +127,17 @@ Create function named "manage_inventory" in views.py that have id(default value=
  - All inventory as queryset to "inventoryList" variable
  - "inventory Form" to form variable
 """
+
+def get_brand_its_model(inventory_obj):
+    if inventory_obj.model.is_active == True:
+        brand_obj = Brand.objects.all()
+        model_obj = Model.objects.filter(brand_id=inventory_obj.brand_id, is_active=True)
+        is_active = True
+    else:
+        brand_obj = Brand.objects.filter(id=inventory_obj.brand_id)
+        model_obj = Model.objects.filter(id=inventory_obj.model.id)
+        is_active = False
+    return brand_obj, model_obj
 # @login_required
 def manage_inventory(request, id=0):
     project = None
@@ -181,7 +188,7 @@ def manage_inventory(request, id=0):
 
 
 def add_inventory(request, proj_id):
-    # project_obj = get_object_or_404(Project.objects.prefetch_related('inventory_set__brand', 'inventory_set__model', 'inventory_set__product_type'), id=proj_id)
+
     project_obj = get_object_or_404(Project.objects.prefetch_related(
         Prefetch('inventory_set', queryset=Inventory.objects.select_related('brand', 'model', 'product_type'))
     ), id=proj_id)
@@ -193,9 +200,7 @@ def add_inventory(request, proj_id):
             init_list_for_dropdownlist_inventory_form(form)
         else:
             form = InventoryForm()
-            # inventory_prev_obj = list_inventory[0]
-            # brand_obj, model_obj = get_brand_its_model(inventory_prev_obj)
-            # init_list_for_dropdownlist_inventory_form(form, brand_obj, model_obj)
+
     else:
         form = InventoryForm(request.POST)
         if form.is_valid():
@@ -218,13 +223,12 @@ def update_inventory(request, id):
     project_obj = inventory_obj.project
     
     if (request.method == "GET"):
-        form = InventoryForm(instance=inventory_obj)
-        # brand_obj, model_obj = get_brand_its_model(inventory_obj)
-
-        # init_list_for_dropdownlist_inventory_form(form, brand_obj, model_obj)
+        form = InventoryForm(instance=inventory_obj)        
+        brand_obj, model_obj = get_brand_its_model(inventory_obj)
+        init_list_for_dropdownlist_inventory_form(form, brand_obj, model_obj)
     else:
         form = InventoryForm(request.POST, instance=inventory_obj)
-        # init_list_for_dropdownlist_inventory_form(form)
+        init_list_for_dropdownlist_inventory_form(form)
         
         if form.is_valid():
             if form.has_changed():

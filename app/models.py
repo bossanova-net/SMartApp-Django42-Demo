@@ -77,6 +77,7 @@ class Brand(models.Model):
 class Model(models.Model):
     model_name=models.CharField(max_length=100)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
     def __str__(self):
         # return f'{self.brand.brand_name} - {self.model_name}'
         return self.model_name
@@ -84,7 +85,7 @@ class Model(models.Model):
         ordering = ['model_name']
 
     def __str__(self):
-        return f'{self.model_name} - {self.brand.brand_name}'
+        return f'{self.model_name} - {self.brand}'
 
 class Product_Type(models.Model):
     productype_name = models.CharField(max_length=255)
@@ -112,6 +113,7 @@ class Inventory(models.Model):
     customer_warranty_start = models.DateField('Customer Warranty Start')
     customer_warranty_end = models.DateField('Customer Warranty End')
     sla = models.ForeignKey(SLA, on_delete=models.CASCADE)
+    
 
     def __str__(self):
         return f'{self.serial_number} - {self.quantity}'
