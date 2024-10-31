@@ -5,6 +5,23 @@
 
 - create enviroment using requirement.txt
 
+https://docs.djangoproject.com/en/5.1/intro/tutorial01/
+
+project parent path
+D:\pongthsa\Desktop\DjangoWorkShop
+mkdir SMartApp-V2-Dev
+
+back
+cd D:\pongthsa\Desktop\DjangoWorkShop
+django-admin startproject SMartApp_V2_Dev SMartApp_V2_Dev
+
+
+ python manage.py runserver
+
+create app
+
+python manage.py startapp app
+
 run model--> database migrating
 - python manage.py makemigrations
 - python manage.py migrate
