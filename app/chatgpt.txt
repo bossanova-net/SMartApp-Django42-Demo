@@ -1,0 +1,30 @@
+This is code def manage_inventory(request, id=0): funcion  in views.py in  with Django  which I use debug_toolbar  with django-debug-toolbar libarh
+"""
+SELECT "app_brand"."id",
+       "app_brand"."brand_name"
+  FROM "app_brand"
+ WHERE "app_brand"."id" = 3
+ LIMIT 21
+ "3 similar queries."
+
+
+SELECT "app_brand"."id",
+       "app_brand"."brand_name"
+  FROM "app_brand"
+ WHERE "app_brand"."id" = 1
+ LIMIT 21
+ "3 similar queries"
+
+
+SELECT "app_brand"."id",
+       "app_brand"."brand_name"
+  FROM "app_brand"
+ WHERE "app_brand"."id" = 2
+ LIMIT 21
+
+ "3 similar queries"
+
+how can apply prefetch_related ,prefetch_related  to app_brand and app_model t o reduce similar queries that 1 brand has mant model
+
+
+

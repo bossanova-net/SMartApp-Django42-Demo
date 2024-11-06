@@ -16,7 +16,7 @@ def validate_start_to_date(cleaned_data,startDate_fieldName,endDate_fieldName):
   if (start_date is not None) and (end_date is not None):
       if start_date >  end_date:
        # raise ValidationError(_(f' {startDate_fieldName} must be less than {endDate_fieldName}'))
-       return  _(f' {endDate_fieldName} must be more than {startDate_fieldName}')
+       return  (f' {endDate_fieldName} must be more than {startDate_fieldName}')
   else:
       return None
 
@@ -46,6 +46,12 @@ class ProjectForm(forms.ModelForm):
             'project_start': MyDateInput(format=["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"], ),
             'project_end': MyDateInput(format=["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M"], ),
         }
+        
+    def clean(self):
+        cleaned_data = super().clean()
+        error_project_date = validate_start_to_date(cleaned_data, "project_start", "project_end")
+        if error_project_date is not None:
+            self.add_error("project_start", ValidationError(error_project_date))
         
 class InventoryForm(forms.ModelForm):
     class Meta:

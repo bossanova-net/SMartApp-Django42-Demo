@@ -85,7 +85,8 @@ def manage_project(request, id=0):
             else:
                 messages.error(request, form.errors)
 
-    projectList = Project.objects.prefetch_related('company').all()
+    projectList = Project.objects.select_related('company').all()
+    #projectList = Project.objects.all()
     
     projectFilter = ProjectFilter(request.GET, queryset=projectList)
     
@@ -143,7 +144,8 @@ def manage_inventory(request, id=0):
     project = None
     isNotEmplyQuery = checkEmpyQueryString(request)
     
-    inventoryList = Inventory.objects.all().prefetch_related('project','model', 'brand', 'product_type')
+    inventoryList = Inventory.objects.select_related('project', 'brand','model', 'product_type').all()
+    #inventoryList = Inventory.objects.all()
     
     request.session['company_query'] = request.GET.get('company')
     
@@ -151,7 +153,7 @@ def manage_inventory(request, id=0):
         if id == 0:
             form = InventoryForm()
         else:
-            inventory = get_object_or_404(Inventory.objects.select_related('project'), id=id)  
+            # inventory = get_object_or_404(Inventory.objects.select_related('project'), id=id)  
             form = InventoryForm(instance=inventory)
     else:
         if id == 0:
@@ -174,7 +176,8 @@ def manage_inventory(request, id=0):
 
     # if inventoryFilter.form.is_valid():
     if inventoryFilter.qs.count() > 0  :
-        inventoryList = inventoryFilter.qs
+        #inventoryList = inventoryFilter.qs
+        inventoryList = inventoryFilter.qs.select_related('project__company','brand','model').all()
         listIDs = [x.id for x in inventoryList]
         request.session['query_inventory'] = listIDs
     else:

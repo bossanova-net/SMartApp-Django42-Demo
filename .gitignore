@@ -12,7 +12,6 @@ settings_oauth2_jwt.py
 genOAuthToken.py
 search_entry.html
 YIT-Widecard-2022.pfx
-.env
 *.lnk
 *.url
 *.pdf
